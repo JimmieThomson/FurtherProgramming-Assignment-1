@@ -6,6 +6,7 @@
  *  Description: All the tasks and initialization happen here
  * */
 
+import java.io.File;
 import java.util.ArrayList;
 import java.util.Scanner;
 
@@ -16,7 +17,7 @@ public class Main {
     private static Scanner scanner = new Scanner(System.in);
 
     public static void main(String[] args) {
-        imp = new fileImport("/Users/jamesthomson/IdeaProjects/FurtherProgramming Assignment 1/src/course.csv");
+        imp = new fileImport((new File("src/course.csv")).getAbsolutePath());
         try {
             System.out.println(imp.content());
         } catch (Exception e) {
@@ -41,6 +42,8 @@ public class Main {
                 searchByKeyword();
             } else if (item.equals("2")) {
                 showEnrolledCourses();
+            } else if(item.equals("3")){
+                removeEnrolledCourses();
             }
         }
     }
@@ -71,5 +74,10 @@ public class Main {
             System.out.printf(i + ") %s \t %s \t %s\n", course.get(0), course.get(3), course.get(5));
             i++;
         }
+    }
+
+    public static void removeEnrolledCourses(){
+        showEnrolledCourses();
+
     }
 }
