@@ -16,6 +16,7 @@ import java.util.Scanner;
 public class fileImport {
     String path;
     List<ArrayList<String>> csvContent;
+    //Need to change this to HashSet!
     List<ArrayList<String>> enrolledClasses;
 
 
@@ -74,11 +75,24 @@ public class fileImport {
         return Phrases;
     }
 
+    //Adds a course onto the dynamic array enrolledClasses
     public boolean addCourse(String courseName){
+        //Looping through each Array in the Array
         for (ArrayList<String> course : this.csvContent) {
+            //Extracting the course name and seeing if they match
             if(course.get(0).equalsIgnoreCase(courseName)){
                 enrolledClasses.add(course);
                 System.out.println(enrolledClasses);
+                return true;
+            }
+        }
+        return false;
+    }
+
+    public boolean removeCourse(String courseName){
+        for (ArrayList<String> course : this.csvContent) {
+            if(course.get(0).equalsIgnoreCase(courseName)){
+                enrolledClasses.remove(course);
                 return true;
             }
         }
