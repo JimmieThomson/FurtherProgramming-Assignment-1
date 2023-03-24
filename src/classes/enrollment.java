@@ -27,15 +27,16 @@ public class enrollment {
 
     //Runs the program
     public void run() {
-            System.out.println("Welcome to MyTimetable! \n");
-            mainMenu();
+        System.out.println("Welcome to MyTimetable! \n");
+        mainMenu();
     }
 
     //Creates a Main Menu and directs user to methods when given a value
     public void mainMenu() {
-        label:
         //While loop is used as not to create memory Problems :)
-        while(true) {
+        while (true) {
+            System.err.flush();
+            System.out.flush();
             System.out.print("-------------------------------------------------------------------------------- \n" +
                     "> Select from main menu \n" +
                     "-------------------------------------------------------------------------------- \n" +
@@ -59,13 +60,13 @@ public class enrollment {
                 case "4":
                     return;
                 default:
-                    break label;
+                    System.err.println("Please use a Valid input (1,2,3,etc)");
             }
         }
     }
 
     //This method gets a users input of name of what course they wish to enroll with then places that into a hashmap
-    public void searchEnrollment(){
+    public void searchEnrollment() {
         //brand being a course key word or something
         System.out.print("Please provide a brand:");
         String keyword = scanner.nextLine();
@@ -74,67 +75,80 @@ public class enrollment {
         String[] Matches = SearchKeyWord(keyword).toArray(new String[0]);
 
         int lengthOfMatches = Matches.length;
-        System.out.println("-------------------------------------------------------------------------------- \n" +
-                "> Select from matching list \n" +
-                "--------------------------------------------------------------------------------");
+        if (lengthOfMatches != 0) {
+            System.out.println("-------------------------------------------------------------------------------- \n" +
+                    "> Select from matching list \n" +
+                    "--------------------------------------------------------------------------------");
 
-        //Loops through each keyword and places a number next to them
-        for (int i = 0; i < lengthOfMatches; i++) {
-            System.out.println((i + 1) + ") " + Matches[i]);
-        }
-        System.out.print(lengthOfMatches + 1 + ") Go to main menu\n" + "Please select: ");
-        int Course = scanner.nextInt() - 1;
+            //Loops through each keyword and places a number next to them
+            for (int i = 0; i < lengthOfMatches; i++) {
+                System.out.println((i + 1) + ") " + Matches[i]);
+            }
+            System.out.print(lengthOfMatches + 1 + ") Go to main menu\n" + "Please select: ");
+            int Course = scanner.nextInt() - 1;
 
-        //Gets the course name and add that course name by sending it to addCourses method
-        //Returns the user back to the main menu by adding an exit after every key word is displayed
-        if ((lengthOfMatches + 1) == Course) {
-            return;
+            //Gets the course name and add that course name by sending it to addCourses method
+            //Returns the user back to the main menu by adding an exit after every key word is displayed
+            if ((lengthOfMatches + 1) == Course) {
+                return;
+            } else {
+                addCourse(Matches[Course]);
+            }
+            scanner.nextLine();
         } else {
-            addCourse(Matches[Course]);
+            System.err.println("No Courses under that word are found!");
         }
-        scanner.nextLine();
     }
 
     //Shows the enrolled courses in a formatted way
-    public void showEnrolledCourses(){
+    public boolean showEnrolledCourses() {
         int Counter = 1;
 
-        //Loops through each courseName in the enrolled classes HashMap
-        for (String name: this.enrolledClasses.keySet()) {
-            System.out.print(Counter + ") " + name + " ");
+        //Used is there is no currently enrolled courses
+        if(!enrolledClasses.isEmpty()) {
 
-            String[] parts = this.enrolledClasses.get(name).split(",");
-            StringBuilder formattedOutput = new StringBuilder();
+            //Loops through each courseName in the enrolled classes HashMap
+            for (String name : this.enrolledClasses.keySet()) {
+                System.out.print(Counter + ") " + name + " ");
 
-            //Formatting the seperated array into spaces
-            for(String word: parts){
-                formattedOutput.append(word).append(" ");
+                String[] parts = this.enrolledClasses.get(name).split(",");
+                StringBuilder formattedOutput = new StringBuilder();
+
+                //Formatting the seperated array into spaces
+                for (String word : parts) {
+                    formattedOutput.append(word).append(" ");
+                }
+
+                //Prints out the course every loop
+                System.out.println(formattedOutput);
+                Counter++;
             }
-
-            //Prints out the course every loop
-            System.out.println(formattedOutput);
-            Counter++;
+            return true;
+        }else{
+            return false;
         }
     }
 
     //Removes enrolled courses
-    public void removeEnrolledCourses(){
+    public void removeEnrolledCourses() {
         //Method to show what the user what they are currently enrolled with
-        showEnrolledCourses();
-        System.out.print("Please Select: ");
-        String course = scanner.nextLine();
-        int Counter = 1;
+        if(showEnrolledCourses()) {
+            System.out.print("Please Select: ");
+            String course = scanner.nextLine();
+            int Counter = 1;
 
-        //As there is no way to specify using an int value a loop must be used if the numbers match using a for loop and counter
-        for (String name: this.enrolledClasses.keySet()) {
-            if(course.equalsIgnoreCase(String.valueOf(Counter))) {
-                this.enrolledClasses.remove(name);
-                System.out.println(name + " has been REMOVED!");
-                break;
+            //As there is no way to specify using an int value a loop must be used if the numbers match using a for loop and counter
+            for (String name : this.enrolledClasses.keySet()) {
+                if (course.equalsIgnoreCase(String.valueOf(Counter))) {
+                    this.enrolledClasses.remove(name);
+                    System.out.println(name + " has been REMOVED!");
+                    break;
+                }
+                Counter++;
             }
-            Counter++;
+        }else{
+            System.err.println("There are no Enrolled courses!");
         }
-        scanner.nextLine();
     }
 
     //Returns a Dynamic array of matching words from the csvContent phrases
@@ -157,13 +171,13 @@ public class enrollment {
     }
 
     //Adds a course onto the dynamic array enrolledClasses
-    public void addCourse(String courseName){
+    public void addCourse(String courseName) {
         try {
             //Using the csvContentMaker class to get the key and value
             HashMap<String, String> csvContent = Content.getCsvContent();
             //adding it to the HashMap
             this.enrolledClasses.put(courseName, csvContent.get(courseName));
-        }catch(Exception e){
+        } catch (Exception e) {
             System.err.println("An error Occurred (Course does not exist)!");
         }
     }

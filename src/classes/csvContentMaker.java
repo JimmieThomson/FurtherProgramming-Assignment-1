@@ -17,12 +17,13 @@ import java.util.Scanner;
 
 public class csvContentMaker {
     /*
-    * csvContent Hold the values of all courses using a Hash Map
-    * As a Hashmap cannot have duplicates this is perfect for courses
-    * It's also easy to find
-    */
+     * csvContent Hold the values of all courses using a Hash Map
+     * As a Hashmap cannot have duplicates this is perfect for courses
+     * It's also easy to find
+     */
     private final HashMap<String, String> csvContent;
-    public csvContentMaker(){
+
+    public csvContentMaker() {
         this.csvContent = content();
     }
 
@@ -53,7 +54,7 @@ public class csvContentMaker {
             }
             sc.close();  //closes the scanner
             return temp;
-        }catch(FileNotFoundException e) {
+        } catch (FileNotFoundException e) {
             System.err.println(e.getCause() + ": File was not found!");
         }
         //Returns a null value if there was a problem!
@@ -61,7 +62,7 @@ public class csvContentMaker {
     }
 
     //Returns a dynamic array of all course names in the csv file
-    public ArrayList<String> getCourseNames(){
+    public ArrayList<String> getCourseNames() {
         //gets all key sets and places them into a Dynamic array and returns that value
         return new ArrayList<>(this.csvContent.keySet());
     }
