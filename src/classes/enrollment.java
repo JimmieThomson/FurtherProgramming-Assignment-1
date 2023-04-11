@@ -8,6 +8,9 @@ package classes;
  *
  * */
 
+import classes.customExceptions.NoCourseFoundException;
+import classes.customExceptions.NoEnrolledCoursesFound;
+
 import java.util.*;
 
 public class enrollment {
@@ -16,13 +19,13 @@ public class enrollment {
     //Local scanner as not to initialize it with every Method
     private final Scanner scanner;
     //Class initialization
-    private final csvContentMaker Content;
+    private final csvFileImporter Content;
 
 
     public enrollment() {
         this.enrolledClasses = new HashMap<>();
         this.scanner = new Scanner(System.in);
-        this.Content = new csvContentMaker();
+        this.Content = new csvFileImporter();
     }
 
     //Runs the program
@@ -35,32 +38,36 @@ public class enrollment {
     public void mainMenu() {
         //While loop is used as not to create memory Problems :)
         while (true) {
-            System.err.flush();
-            System.out.flush();
-            System.out.print("-------------------------------------------------------------------------------- \n" +
-                    "> Select from main menu \n" +
-                    "-------------------------------------------------------------------------------- \n" +
-                    "   1) Search by keyword to enroll \n" +
-                    "   2) Show my enrolled courses \n" +
-                    "   3) Withdraw from a course \n" +
-                    "   4) Exit \n" +
-                    "Please select:");
-            String item = scanner.nextLine();
-            //Standard Switch to replace if statements
-            switch (item) {
-                case "1":
-                    searchEnrollment();
-                    break;
-                case "2":
-                    showEnrolledCourses();
-                    break;
-                case "3":
-                    removeEnrolledCourses();
-                    break;
-                case "4":
-                    return;
-                default:
-                    System.err.println("Please use a Valid input (1,2,3,etc)");
+            try {
+                System.err.flush();
+                System.out.flush();
+                System.out.print("-------------------------------------------------------------------------------- \n" +
+                        "> Select from main menu \n" +
+                        "-------------------------------------------------------------------------------- \n" +
+                        "   1) Search by keyword to enroll \n" +
+                        "   2) Show my enrolled courses \n" +
+                        "   3) Withdraw from a course \n" +
+                        "   4) Exit \n" +
+                        "Please select:");
+                String item = scanner.nextLine();
+                //Standard Switch to replace if statements
+                switch (item) {
+                    case "1":
+                        searchEnrollment();
+                        break;
+                    case "2":
+                        showEnrolledCourses();
+                        break;
+                    case "3":
+                        removeEnrolledCourses();
+                        break;
+                    case "4":
+                        return;
+                    default:
+                        System.err.println("Please use a Valid input (1,2,3,etc)");
+                }
+            }catch(NoEnrolledCoursesFound e){
+                System.err.println("No Courses can be removed please add one!");
             }
         }
     }
@@ -89,10 +96,15 @@ public class enrollment {
 
             //Gets the course name and add that course name by sending it to addCourses method
             //Returns the user back to the main menu by adding an exit after every key word is displayed
-            if ((lengthOfMatches + 1) == Course) {
+            if (lengthOfMatches == Course) {
+                scanner.nextLine();
                 return;
             } else {
-                addCourse(Matches[Course]);
+                try {
+                    addCourse(Matches[Course]);
+                }catch (Exception e) {
+                    System.err.println("An error Occurred (Course does not exist)!");
+                }
             }
             scanner.nextLine();
         } else {
@@ -112,25 +124,21 @@ public class enrollment {
                 System.out.print(Counter + ") " + name + " ");
 
                 String[] parts = this.enrolledClasses.get(name).split(",");
-                StringBuilder formattedOutput = new StringBuilder();
-
-                //Formatting the seperated array into spaces
-                for (String word : parts) {
-                    formattedOutput.append(word).append(" ");
-                }
 
                 //Prints out the course every loop
-                System.out.println(formattedOutput);
+                //Prints out the course every loop
+                System.out.printf("%s \t %s %s \t %s hours%n", parts[2], parts[3].substring(0, 3), parts[4], parts[5]);
                 Counter++;
             }
             return true;
         }else{
+            System.out.println("No enrolled Courses");
             return false;
         }
     }
 
     //Removes enrolled courses
-    public void removeEnrolledCourses() {
+    public void removeEnrolledCourses() throws NoEnrolledCoursesFound{
         //Method to show what the user what they are currently enrolled with
         if(showEnrolledCourses()) {
             System.out.print("Please Select: ");
@@ -147,7 +155,7 @@ public class enrollment {
                 Counter++;
             }
         }else{
-            System.err.println("There are no Enrolled courses!");
+            throw new NoEnrolledCoursesFound("No courses have been found!");
         }
     }
 
@@ -171,15 +179,22 @@ public class enrollment {
     }
 
     //Adds a course onto the dynamic array enrolledClasses
-    public void addCourse(String courseName) {
-        try {
+    public void addCourse(String courseName) throws NoCourseFoundException {
             //Using the csvContentMaker class to get the key and value
             HashMap<String, String> csvContent = Content.getCsvContent();
             //adding it to the HashMap
-            this.enrolledClasses.put(courseName, csvContent.get(courseName));
-        } catch (Exception e) {
-            System.err.println("An error Occurred (Course does not exist)!");
-        }
+            //Validating if the course name exists in csv
+            for (String Key: csvContent.keySet()){
+                if(Key.equalsIgnoreCase(courseName)){
+                    this.enrolledClasses.put(courseName, csvContent.get(courseName));
+                    System.out.printf("You have enrolled in the course %s!%n\n",courseName);
+                    return;
+                }
+            }
+            throw new NoCourseFoundException("No Course Found!");
     }
 
+    public HashMap<String,String> getEnrolledClasses() {
+        return this.enrolledClasses;
+    }
 }

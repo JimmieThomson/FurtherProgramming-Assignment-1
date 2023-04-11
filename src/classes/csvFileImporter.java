@@ -15,7 +15,7 @@ import java.util.Scanner;
  *
  * */
 
-public class csvContentMaker {
+public class csvFileImporter {
     /*
      * csvContent Hold the values of all courses using a Hash Map
      * As a Hashmap cannot have duplicates this is perfect for courses
@@ -23,7 +23,7 @@ public class csvContentMaker {
      */
     private final HashMap<String, String> csvContent;
 
-    public csvContentMaker() {
+    public csvFileImporter() {
         this.csvContent = content();
     }
 
